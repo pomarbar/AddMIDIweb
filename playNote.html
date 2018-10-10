@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+	<head>
+		<script src='https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0010_GeneralUserGS_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0090_JCLive_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0120_FluidR3_GM_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0190_Aspirin_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0220_JCLive_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0240_SoundBlasterOld_sf2.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0520_Aspirin_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0530_Aspirin_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0570_JCLive_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0660_Aspirin_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0710_JCLive_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0730_Aspirin_sf2_file.js'></script>
+		<script src='https://surikov.github.io/webaudiofontdata/sound/0750_FluidR3_GM_sf2_file.js'></script>
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script>
+			var instrumento = [
+				_tone_0010_GeneralUserGS_sf2_file, //Piano
+				_tone_0090_JCLive_sf2_file,        //Carrillón
+				_tone_0120_FluidR3_GM_sf2_file,    //Marimba
+				_tone_0190_Aspirin_sf2_file,       //ChurchOrgan
+				_tone_0220_JCLive_sf2_file,		   //Armónica
+				_tone_0240_SoundBlasterOld_sf2,    //Guitarra
+				_tone_0520_Aspirin_sf2_file,       //Coro Aah
+				_tone_0530_Aspirin_sf2_file,       //Coro duh
+				_tone_0570_JCLive_sf2_file,        //Trombone
+				_tone_0660_Aspirin_sf2_file,       //Saxofón
+				_tone_0710_JCLive_sf2_file,        //Clarinete
+				_tone_0730_Aspirin_sf2_file,       //Flauta
+				_tone_0750_FluidR3_GM_sf2_file     //PanFlute 
+			];
+			var numInstr = [15,104,127,191,228,252,577,589,629,713,755,772,792];
+			var iniInstr = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+		//==============================================================================================
+		//                       API WEBAUDIOFONT PARA TOCAR ARCHIVOS MIDI
+		//                   disponible en: https://surikov.github.io/webaudiofont
+		//==============================================================================================
+			var selectedPreset=instrumento[0];
+			var indexInstr = 0;
+			var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+			var audioContext = new AudioContextFunc();
+			var player = new WebAudioFontPlayer();
+			player.loader.decodeAfterLoading(audioContext, "'" + selectedPreset + "'");
+
+			// Parámetros de listaSons:[[tiempoInicio,alturaMIDI,duración,volumen]];
+			var listaSons = [[0,60,1,0.5],[0.4,63,1,0.5],[0.8,67,1,0.5],[1.2,71,1,0.5],[1.6,72,1,0.5]];
+			function tocarSonidos(){
+				if (iniInstr[indexInstr] == 0) {
+					alert("Por favor, vuelva a oprimir PLAY.");
+					iniInstr[indexInstr] = 1;
+				};
+				var tiempo = audioContext.currentTime;
+				for (var i = 0; i < listaSons.length; i++) {
+					var ltemp = listaSons[i];
+					var mm = tiempo + ltemp[0];
+					player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, mm, ltemp[1], ltemp[2],ltemp[3]);
+				};
+			}
+
+			function instrumentoSel(){
+				var x = parseInt(document.getElementById("OS").selectedIndex);
+				var n = numInstr[x];
+				var info=player.loader.instrumentInfo(n)
+				player.loader.startLoad(audioContext, info.url, info.variable);
+				//  player.loader.waitLoad(function () {
+				// 	currentGuitar=window[info.variable];
+				// 	player.cancelQueue(audioContext);
+					// started=false;
+					// start();
+				// });
+				selectedPreset = instrumento[x];
+				indexInstr = x;
+			}
+		//==============================================================================================
+
+		</script>
+	</head>
+	<body>
+		<p><a onclick="tocarSonidos();">PLAY</a></p>
+		<hr/>
+		<!--p><a href="https://github.com/surikov/webaudiofont">source</a></p-->
+		<p><a href="javascript:player.cancelQueue(audioContext);">stop</a></p>
+		<div >
+            <select id="OS" size=8 onclick="instrumentoSel();">
+                <optgroup id="opciones" label="Instrumentos"> 
+                    <option>Piano</option>
+                    <option>Carrillón</option>
+                    <option>Marimba</option>  
+	                <option>Órgano</option>  
+	                <option>Armónica</option>  
+	                <option>Guitarra</option>  
+	                <option>Coro Ahh</option>  
+	                <option>Coro duh</option>  
+	                <option>Trombón</option>  
+	                <option>Saxofón</option>  
+	                <option>Clarinete</option>  
+	                <option>Flauta</option> 
+	                <option>Flauta Pan</option> 
+                </optgroup> 
+            </select>
+        </div>
+	</body>
+</html>
